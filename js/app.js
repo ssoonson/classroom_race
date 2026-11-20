@@ -36,6 +36,8 @@ refreshBgmFile({ checkFolder: state.bgm === 'file' }); // 고른 음악 파일(�
 try {
   const stage = createStage($('#canvasMount'));
   const director = createCameraDirector(stage.camera);
+  director.attachControls(stage.renderer.domElement); // 마우스: 드래그 회전, 휠 확대/축소, 더블클릭 원래대로
+  on('camera:reset', () => director.resetView());
   const quality = createQualityController(stage);
   const effects = createEffects(stage.scene);
   attachStage(stage);
@@ -50,7 +52,6 @@ try {
 
   const IDLE_FRAME_MS = 32; // 경기 중이 아닐 때는 약 30fps로만 그려 노트북 배터리·발열을 아낌
   let last = 0;
-  let packZ = 26;
   const frame = (time) => {
     requestAnimationFrame(frame);
     const live = isLive();
@@ -66,11 +67,10 @@ try {
       remaining: remainingSeconds(),
       reducedMotion: state.reducedMotion,
       track: currentTrack(),
-      packZ,
       order: race.phase === 'ready' ? race.runners : orderedRunners(),
       focus: race.runners.find((r) => r.id === race.followId),
     });
-    packZ = updateTrackView(stage.camera.position.z);
+    updateTrackView(stage.camera.position.z);
     updateLabels(stage.camera);
     stage.render();
     debug?.update(rawDt, stage.renderer.info, quality.level, director.shot);

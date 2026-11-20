@@ -25,7 +25,7 @@ export const SPEEDS = [1, 1.5, 2];
 
 export const CAMERA_MODES = {
   auto: '자동 전환',
-  overview: '전체 보기',
+  overview: '선두 무리 보기',
   follow: '선수 추적',
 };
 

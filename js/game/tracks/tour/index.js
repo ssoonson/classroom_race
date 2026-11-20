@@ -82,11 +82,6 @@ export function build() {
     shadows: false,
     stages: TOUR_STAGES,
     stageAt,
-    /** 전체 보기: 선두 무리 뒤 위쪽에서 앞을 내려다봄 */
-    overview(packZ) {
-      const rear = packZ + 38, ahead = packZ - 24;
-      return { position: [centerX(rear) - 11.5, 24, rear], target: [centerX(ahead), 1.3, ahead] };
-    },
     /** 매 프레임: 하늘·안개 색을 지금 구간에 맞추고, 먼 구간은 숨김 */
     updateView(scene, cameraZ, focusZ) {
       themeColor(scene.background, focusZ, 'sky');

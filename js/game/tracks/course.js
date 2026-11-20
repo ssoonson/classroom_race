@@ -59,6 +59,5 @@ export function buildStraightTrack(theme) {
     curved: false,
     centerX: () => 0,
     shadows: true,
-    overview: () => ({ position: [0, 57, 75], target: [0, 0, -38] }),
   };
 }

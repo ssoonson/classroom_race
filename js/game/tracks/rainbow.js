@@ -312,6 +312,5 @@ export function build() {
     curved: true,
     centerX,
     shadows: false, // 흰 노면이 빛을 받지 않는 재질이라 실시간 그림자 대신 발밑 그림자 사용
-    overview: () => ({ position: [-16.5, 31, 73], target: [-7.5, 1.3, -5] }),
   };
 }

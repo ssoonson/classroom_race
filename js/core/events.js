@@ -16,6 +16,7 @@
 //   race:stage      { label }                 테마 투어에서 지금 구간이 바뀜 (예: '🌈 무지개 정원 · 2/5')
 //   race:finished   { result }                경기 종료, 결과 데이터
 //   camera:changed  { mode, followId }        카메라 모드 변경
+//   camera:reset    {}                        마우스로 돌린 카메라를 원래 시점으로
 //   quality:changed { level, auto }           실제 적용된 그래픽 품질 (high|medium|low)
 
 const bus = new EventTarget();
