@@ -1,0 +1,11 @@
+/* 초기 접속 화면 (경기장 가운데 READY 카드) */
+.start-screen{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:min(440px,86%);z-index:2}
+.start-card{text-align:center;background:#fffdf3f2;padding:22px 26px;border-radius:20px;box-shadow:0 10px 30px #1e322c22}
+.badge-large{font-size:38px;font-weight:1000;color:#ed9e11;letter-spacing:1px}
+.start-card h2{margin:4px 0 12px;font-size:21px}
+.start-summary{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.start-summary span{background:#eef3e8;border:1px solid #d6dfcf;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700}
+.start-card p{font-size:13px;color:#56645d;line-height:1.55;margin:12px 0}
+.start-actions{display:flex;gap:8px;justify-content:center}
+.start-actions button{min-width:130px}
+@media(max-width:600px){.start-card{padding:16px}.badge-large{font-size:28px}.start-actions button{min-width:0;flex:1}}

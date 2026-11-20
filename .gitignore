@@ -1,0 +1,4 @@
+# 학생 실명이 들어 있는 백업·기록 파일은 올리지 않습니다
+classroom-race-backup*.json
+classroom-race-history*.csv
+*.zip

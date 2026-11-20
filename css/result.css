@@ -1,0 +1,9 @@
+/* 경기 결과 창 */
+.result-overlay{position:fixed;inset:0;background:#102320aa;z-index:10;display:flex;align-items:center;justify-content:center;padding:15px}
+.result-card{background:#fffaf0;border-radius:22px;padding:20px;width:min(600px,100%);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 80px #0007}
+.result-head{display:flex;justify-content:space-between;align-items:center}
+.result-head h2{margin:0}
+.result-list{overflow:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.result-item{padding:9px;border-radius:9px;background:#fff;border:1px solid #e9ddbd;font-size:13px}
+.result-item:first-child{background:#fff0ad}
+@media(max-width:600px){.result-list{grid-template-columns:1fr}}

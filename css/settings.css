@@ -1,0 +1,31 @@
+/* 설정 창 */
+.overlay{position:fixed;inset:0;background:#102320aa;z-index:10;display:flex;align-items:center;justify-content:center;padding:15px}
+.dialog{background:#f7f3e9;width:min(1200px,100%);max-height:95dvh;display:flex;flex-direction:column;box-shadow:0 18px 60px #0005;border-radius:12px;overflow:hidden}
+.dialog-head{background:#202d2a;color:white;padding:12px 19px;display:flex;align-items:center;justify-content:space-between}
+.dialog-head h2{font-size:23px;margin:0}
+.tabs{background:#e3dcc5;padding:8px 9px 0;display:flex;gap:5px;overflow:auto}
+.tabs button{background:#d2c8a8;border:0;border-radius:10px 10px 0 0;padding:11px 15px;white-space:nowrap}
+.tabs button.selected{background:#f7f3e9}
+.dialog-content{padding:14px 19px;overflow:auto;min-height:270px}
+.tab-content h3{margin:15px 0 5px;font-size:19px}
+.tab-content h3:first-child{margin-top:2px}
+.dialog-footer{padding:8px 17px;background:#e9e3d3;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.smallfield{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.smallfield input{width:85px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:2px solid #263832;background:white;border-radius:11px;padding:6px 10px;font-size:13px}
+.chip small{font-size:11px;color:#8b8570}
+.checkbox-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin:13px 0}
+.checkbox-grid label,.checkbox-row label{display:flex;align-items:center;gap:8px;padding:8px;background:#fff;border-radius:10px}
+.checkbox-grid input,.checkbox-row input{width:auto;accent-color:#d7a52b}
+.group-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin:17px 0}
+.group-item{background:white;border:1px solid #c8d2c2;border-radius:11px;padding:12px}
+.group-item strong{display:block;margin-bottom:9px}
+.group-item p{font-size:13px;margin:3px 0}
+.control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.control-grid label{display:grid;gap:5px;font-weight:700;font-size:13px}
+.control-grid select{min-width:0}
+.checkbox-row{margin:18px 0;display:flex;gap:10px;flex-wrap:wrap}
+.history-item{background:white;border:1px solid #dfe5d7;padding:12px;border-radius:10px;margin:10px 0;font-size:13px}
+.history-item .muted{display:block;margin-bottom:4px}
+@media(max-width:600px){.control-grid{grid-template-columns:1fr}.dialog-content{padding:12px}.tabs button{padding:8px;font-size:12px}}
