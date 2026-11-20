@@ -30,7 +30,8 @@ export function createStage(mount) {
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.fov = Math.max(48, Math.min(65, 56 / camera.aspect)); // 세로로 긴 화면에서는 시야를 넓힘
+    camera.userData.baseFov = Math.max(48, Math.min(65, 56 / camera.aspect)); // 세로로 긴 화면에서는 시야를 넓힘
+    camera.fov = camera.userData.baseFov; // 샷별 추가 시야는 camera.js가 더함
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(mount);

@@ -1,11 +1,13 @@
 // 앱 조립: 화면 모듈을 붙이고, 3D 무대를 만들고, 매 프레임 루프를 돌립니다.
 import { $, toast } from './core/dom.js';
-import { emit } from './core/events.js';
+import { emit, on } from './core/events.js';
+import { refreshBgmFile } from './core/bgm.js';
 import { state, isFirstVisit } from './core/store.js';
 import { createStage } from './game/stage.js';
 import { createCameraDirector } from './game/camera.js';
 import { createQualityController, levelName } from './game/quality.js';
-import { race, isLive, attachStage, updateRace, focusRunner, pauseRace, currentTrack, updateTrackView } from './game/race.js';
+import { createEffects } from './game/effects.js';
+import { race, isLive, attachStage, updateRace, pauseRace, currentTrack, updateTrackView, orderedRunners, remainingSeconds, updateLabels } from './game/race.js';
 import { mountTopbar } from './ui/topbar.js';
 import { mountStartScreen } from './ui/start-screen.js';
 import { mountHud } from './ui/hud.js';
@@ -13,6 +15,9 @@ import { mountCameraPanel } from './ui/camera-panel.js';
 import { mountRankingPanel } from './ui/ranking-panel.js';
 import { mountSettings } from './ui/settings/index.js';
 import { mountResult } from './ui/result.js';
+import { mountAnnouncer } from './ui/announcer.js';
+import { mountRaceBar } from './ui/race-bar.js';
+import { mountRaceSounds } from './ui/race-sounds.js';
 
 // 1) 화면(UI)
 mountTopbar($('#topbar'));
@@ -22,13 +27,25 @@ mountCameraPanel($('#cameraPanel'));
 mountRankingPanel($('#rankingPanel'));
 mountSettings($('#settings'));
 mountResult($('#result'));
+mountAnnouncer($('#announcer'), $('.arena'));
+mountRaceBar($('#raceBar'));
+mountRaceSounds();
+refreshBgmFile({ checkFolder: state.bgm === 'file' }); // 고른 음악 파일(과 '내 음악'이면 사이트의 audio/bgm.mp3) 확인
 
 // 2) 3D 무대 + 루프
 try {
   const stage = createStage($('#canvasMount'));
   const director = createCameraDirector(stage.camera);
   const quality = createQualityController(stage);
+  const effects = createEffects(stage.scene);
   attachStage(stage);
+
+  // 1~3위 골인 때 결승선에서 꽃가루
+  on('race:finisher', ({ rank }) => {
+    const t = currentTrack();
+    if (rank <= 3 && t) effects.burst(t.centerX(t.finishZ), 5, t.finishZ - 1, rank === 1 ? 160 : 70);
+  });
+  on('race:phase', ({ phase }) => { if (phase === 'ready' || phase === 'countdown') effects.clear(); });
   const debug = new URLSearchParams(location.search).has('debug') ? createDebugOverlay() : null;
 
   const IDLE_FRAME_MS = 32; // 경기 중이 아닐 때는 약 30fps로만 그려 노트북 배터리·발열을 아낌
@@ -42,18 +59,21 @@ try {
     last = time;
     quality.sample(rawDt, race.phase === 'running');
     updateRace(rawDt);
+    effects.update(Math.min(0.07, rawDt));
     director.update(Math.min(0.07, rawDt), {
       mode: race.cameraMode,
-      focus: focusRunner(),
-      live: isLive(),
-      elapsed: race.elapsed,
+      phase: race.phase,
+      remaining: remainingSeconds(),
       reducedMotion: state.reducedMotion,
       track: currentTrack(),
       packZ,
+      order: race.phase === 'ready' ? race.runners : orderedRunners(),
+      focus: race.runners.find((r) => r.id === race.followId),
     });
     packZ = updateTrackView(stage.camera.position.z);
+    updateLabels(stage.camera);
     stage.render();
-    debug?.update(rawDt, stage.renderer.info, quality.level);
+    debug?.update(rawDt, stage.renderer.info, quality.level, director.shot);
   };
   requestAnimationFrame(frame);
 } catch (err) {
@@ -70,10 +90,10 @@ function createDebugOverlay() {
   document.body.append(el);
   let frames = 0, time = 0;
   return {
-    update(dt, info, level) {
+    update(dt, info, level, shot) {
       frames++; time += dt;
       if (time < 0.5) return;
-      el.textContent = `${(frames / time).toFixed(0)} fps · 그리기 ${info.render.calls}회 · 삼각형 ${info.render.triangles.toLocaleString()} · 품질 ${levelName(level)}`;
+      el.textContent = `${(frames / time).toFixed(0)} fps · 그리기 ${info.render.calls}회 · 삼각형 ${info.render.triangles.toLocaleString()} · 품질 ${levelName(level)}${shot ? ` · 샷 ${shot}` : ''}`;
       frames = 0; time = 0;
     },
   };

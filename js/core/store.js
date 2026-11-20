@@ -2,7 +2,7 @@
 // 상태를 바꿀 때는 반드시 이 파일의 함수를 사용하세요. 바뀌면 'state:changed' 이벤트가 나갑니다.
 import {
   STORAGE_KEY, BACKUP_FORMAT, MAX_STUDENTS, MIN_PLAYERS, MAX_HISTORY, MAX_NAME_LENGTH,
-  DEFAULT_STATE, TRACKS, CHARACTER_LABELS, SPEEDS, CAMERA_MODES, QUALITY_LABELS,
+  DEFAULT_STATE, TRACKS, CHARACTER_LABELS, SPEEDS, CAMERA_MODES, QUALITY_LABELS, BGM_LABELS,
 } from './config.js';
 import { emit } from './events.js';
 
@@ -41,6 +41,8 @@ function sanitize(raw) {
     namesVisible: typeof d.namesVisible === 'boolean' ? d.namesVisible : DEFAULT_STATE.namesVisible,
     reducedMotion: typeof d.reducedMotion === 'boolean' ? d.reducedMotion : DEFAULT_STATE.reducedMotion,
     quality: oneOf(d.quality, Object.keys(QUALITY_LABELS), DEFAULT_STATE.quality),
+    bgm: oneOf(d.bgm, Object.keys(BGM_LABELS), DEFAULT_STATE.bgm),
+    bgmVolume: Number.isFinite(Number(d.bgmVolume)) ? Math.min(100, Math.max(0, Math.round(Number(d.bgmVolume)))) : DEFAULT_STATE.bgmVolume,
     history: Array.isArray(d.history) ? d.history.map(cleanHistoryEntry).filter(Boolean).slice(0, MAX_HISTORY) : [],
   };
 }

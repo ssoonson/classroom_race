@@ -142,7 +142,7 @@ export function buildRacer(shape, index) {
   [armL, armR, legL, legR].forEach((j) => bakeInto(j));
   model.position.y = model.userData.baseY;
 
-  return { model, armL, armR, legL, legR };
+  return { model, armL, armR, legL, legR, color: '#' + color.getHexString() };
 }
 
 /** 두 레이서 공통 달리기 동작. phase: 걸음 위상, jump: 점프 높이 */

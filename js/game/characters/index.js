@@ -1,5 +1,5 @@
 // 캐릭터 목록과 공통 조립.
-// 새 캐릭터를 추가하려면: 이 폴더에 block.js 같은 파일을 만들고(label, nameTagY, build(index), animate),
+// 새 캐릭터를 추가하려면: 이 폴더에 block.js 같은 파일을 만들고(label, nameTagY, build(index) → {model, armL, armR, legL, legR, color}, animate),
 // 아래 CHARACTER_TYPES와 core/config.js의 CHARACTER_LABELS에 한 줄씩 추가하세요.
 import { THREE } from '../parts.js';
 import * as block from './block.js';

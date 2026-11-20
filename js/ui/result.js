@@ -29,11 +29,13 @@ export function mountResult(el) {
       .catch(() => toast('클립보드 권한을 확인해 주세요.'));
   };
 
+  let showTimer;
   on('race:finished', ({ result }) => {
     $('[data-summary]', el).textContent = `${result.className} · ${result.trackName} · ${result.order.length}명 완주`;
     $('[data-list]', el).innerHTML = result.order
       .map((name, i) => `<div class="result-item">${medal(i)} <strong>${escapeHTML(name)}</strong></div>`).join('');
-    el.hidden = false;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(() => { if (race.phase === 'finished') el.hidden = false; }, 1500); // 마지막 골인 장면을 잠깐 보여 준 뒤
   });
-  on('race:phase', ({ phase }) => { if (phase !== 'finished') el.hidden = true; });
+  on('race:phase', ({ phase }) => { if (phase !== 'finished') { clearTimeout(showTimer); el.hidden = true; } });
 }

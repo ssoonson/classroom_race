@@ -3,10 +3,10 @@ import { $, formatTime } from '../core/dom.js';
 import { on } from '../core/events.js';
 import { state, participants } from '../core/store.js';
 import { trackLabel, raceSeconds } from '../core/config.js';
-import { race, isLive, togglePause, resetRace } from '../game/race.js';
+import { race, isLive, togglePause, resetRace, remainingSeconds } from '../game/race.js';
 import { requestStart } from './actions.js';
 
-const STATUS = { ready: '대기 중', running: '경기 중', paused: '일시정지', finished: '경기 종료' };
+const STATUS = { ready: '대기 중', countdown: '출발 준비', running: '경기 중', paused: '일시정지', finished: '경기 종료' };
 
 export function mountHud(el) {
   el.innerHTML = `
@@ -33,19 +33,20 @@ export function mountHud(el) {
     const snap = race.snapshot;
     const percent = ready ? 0 : Math.min(100, Math.round((race.elapsed / race.duration) * 100));
     q('[data-track]').textContent = !ready && race.stageLabel ? race.stageLabel : trackLabel(ready || !snap ? state.track : snap.track);
-    q('[data-time]').textContent = formatTime(ready ? raceSeconds(state.speed) : race.duration - race.elapsed);
+    q('[data-time]').textContent = formatTime(ready ? raceSeconds(state.speed) : remainingSeconds());
     q('[data-status]').textContent = STATUS[race.phase];
     q('[data-people]').textContent = `${ready ? participants().length : race.roster.length}명 참가`;
     q('[data-progress-label]').textContent = `진행률 ${percent}%`;
     q('[data-progress]').style.width = `${percent}%`;
     q('[data-start]').disabled = isLive();
-    q('[data-pause]').disabled = !isLive();
+    q('[data-pause]').disabled = !isLive() || race.phase === 'countdown';
     q('[data-pause]').textContent = race.phase === 'paused' ? '▶ 계속' : 'Ⅱ 일시정지';
   }
 
   on('race:phase', render);
   on('race:tick', render);
   on('race:stage', render);
+  on('race:second', render); // 마지막 10초는 매초 갱신
   on('state:changed', render);
   render();
 }

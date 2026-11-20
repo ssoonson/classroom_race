@@ -37,6 +37,12 @@ export const QUALITY_LABELS = {
   low: '낮음 (그림자 끔, 해상도 낮춤)',
 };
 
+export const BGM_LABELS = {
+  builtin: '기본 음악 (내장)',
+  file: '내 음악 파일',
+  off: '끄기',
+};
+
 export const DEFAULT_STATE = {
   className: '우리 반',
   names: [],
@@ -50,6 +56,8 @@ export const DEFAULT_STATE = {
   namesVisible: true,
   reducedMotion: false,
   quality: 'auto',
+  bgm: 'builtin',
+  bgmVolume: 60,
   history: [],
 };
 

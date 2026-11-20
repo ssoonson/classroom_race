@@ -8,8 +8,9 @@ import * as participants from './tab-participants.js';
 import * as groups from './tab-groups.js';
 import * as history from './tab-history.js';
 import * as display from './tab-display.js';
+import * as music from './tab-music.js';
 
-const TABS = [students, participants, groups, history, display];
+const TABS = [students, participants, groups, history, display, music];
 
 export function mountSettings(el) {
   el.className = 'overlay';
