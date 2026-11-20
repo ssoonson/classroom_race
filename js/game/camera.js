@@ -70,7 +70,8 @@ export function createCameraDirector(camera) {
     const { track, order, focus } = ctx;
     const cx = track ? track.centerX : () => 0;
     const lead = focus || order.find((r) => !r.finished) || order[0];
-    const p = lead?.group.position;
+    // 선수가 없으면(참가선수를 모두 해제한 경우) 출발선을 기준으로
+    const p = lead?.group.position || { x: cx(26), y: 0, z: 26 };
     switch (type) {
       case 'start': {
         const z = 15.5;
