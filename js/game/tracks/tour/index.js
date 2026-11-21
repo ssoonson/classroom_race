@@ -5,6 +5,7 @@
 import { THREE, bakeInto } from '../../parts.js';
 import { TOUR_STAGES, START_Z, STAGE_LENGTH, FINISH_Z, CANDY, IVORY, centerX, stageAt, themeColor, createTourKit } from './kit.js';
 import { buildRoad } from './road.js';
+import { buildMover, moverPosts } from '../../moving-obstacles.js';
 import * as greenhouse from './greenhouse.js';
 import * as garden from './garden.js';
 import * as starlight from './starlight.js';
@@ -25,6 +26,16 @@ export const obstacles = TOUR_STAGES.flatMap((_, stage) => ROWS.flatMap((row) =>
     z: START_Z - stage * STAGE_LENGTH - row.gap,
     halfWidth: row.halfWidth, halfDepth: row.halfDepth, clearHeight: row.clearHeight,
   }))));
+
+// 구간마다 굴러가는 돌(사탕 공과 발판 사이)과 회전 막대(발판 뒤)
+export const movers = TOUR_STAGES.flatMap((_, stage) => {
+  const zoneZ = START_Z - stage * STAGE_LENGTH;
+  const list = [{ kind: 'boulder', x: 0, z: zoneZ - 24, r: 0.85, amp: 8.6, speed: 1 + stage * 0.12, phase: stage, clearHeight: 1.9, stage }];
+  if (stage < TOUR_STAGES.length - 1) {
+    list.push({ kind: 'spinner', x: 0, z: zoneZ - 44, len: 4.2, speed: stage % 2 ? -1.4 : 1.3, phase: stage, clearHeight: 1.2, barY: 0.75, stage });
+  }
+  return list;
+});
 
 function buildObstacles(kit) {
   const { group, geo, part, local, movingPart } = kit;
@@ -58,6 +69,13 @@ export function build() {
   kit.animated.forEach((c) => bakeInto(c.userData.animated, { deep: true, castShadow: false }));
   kit.sections.forEach((s) => bakeInto(s, { deep: true, castShadow: false }));
 
+  // 굴러가는 돌·회전 막대: 구간 그룹에 넣어 먼 구간과 함께 숨겨짐
+  const moving = movers.map((o) => {
+    const m = buildMover(o, centerX, CANDY[(o.stage + 1) % CANDY.length]);
+    kit.sections[o.stage].add(m.group);
+    return { o, update: m.update };
+  });
+
   const FOG_NEAR = 43, FOG_FAR = 134;
 
   /** 카메라 근처 구간만 보이게(나머지는 안개 너머라 숨김) */
@@ -72,7 +90,8 @@ export function build() {
   return {
     group: kit.group,
     animated: kit.animated,
-    obstacles,
+    moving,
+    obstacles: [...obstacles, ...moverPosts(movers)],
     sky: TOUR_STAGES[0].sky,
     fog: { color: TOUR_STAGES[0].sky, near: FOG_NEAR, far: FOG_FAR },
     finishZ: FINISH_Z,

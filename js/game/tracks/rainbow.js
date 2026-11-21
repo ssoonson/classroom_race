@@ -1,6 +1,7 @@
 // 🌈 무지개 운동장 (에셋 v4): 흰색 곡선 트랙, 분홍 난간, 무지개 아치, 사탕나무·오두막·라벤더 언덕,
 // 회전목마·사탕 공·발판·시소. 트랙이 곡선이라 centerX(z)로 중심선을 알려 줍니다.
 import { THREE, add, bakeInto } from '../parts.js';
+import { buildMover, moverPosts } from '../moving-obstacles.js';
 
 const FINISH_Z = -100;
 
@@ -28,6 +29,13 @@ const CANDY_ROWS = [-10, -56];
 const CANDY_X = [-6.6, 0, 6.6];
 const PAD_ROWS = [-24, -41, -85]; // -41은 시소, 나머지는 발판
 const PAD_X = [0, 1, 2, 3].map((i) => -7.7 + i * 5.1);
+
+// 굴러가는 돌·회전 막대 (원래 장애물 줄 사이 빈 곳에)
+export const movers = [
+  { kind: 'spinner', x: 0, z: -32.5, len: 4.2, speed: 1.3, phase: 0, clearHeight: 1.2, barY: 0.75 },
+  { kind: 'boulder', x: 0, z: -48.5, r: 0.85, amp: 8.6, speed: 1.2, phase: 1, clearHeight: 1.9 },
+  { kind: 'boulder', x: 0, z: 18, r: 0.85, amp: 8.6, speed: 1.0, phase: 0.5, clearHeight: 1.9 },
+];
 
 export const obstacles = [
   ...CAROUSELS.map(([x, z]) => ({ kind: 'carousel', x, z, halfWidth: 2.5, halfDepth: 2.5, dodge: true })),
@@ -303,8 +311,16 @@ export function build() {
   animated.forEach((base) => bakeInto(base.userData.animated, { deep: true, castShadow: false }));
   bakeInto(group, { deep: true, castShadow: false });
 
+  // 굴러가는 돌·회전 막대 (배경 합치기 뒤에 붙여야 움직임)
+  const movingParts = movers.map((o, i) => {
+    const m = buildMover(o, centerX, CANDY[i % CANDY.length]);
+    group.add(m.group);
+    return { o, update: m.update };
+  });
+
   return {
-    group, animated, obstacles,
+    group, animated, moving: movingParts,
+    obstacles: [...obstacles, ...moverPosts(movers)],
     sky: SKY,
     fog: { color: FOG, near: 125, far: 255 },
     finishZ: FINISH_Z,

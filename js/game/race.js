@@ -7,6 +7,7 @@ import { clearGroup } from './parts.js';
 import { buildTrack, animateObstacles } from './tracks/index.js';
 import { createRunner, animateRunner, idleRunner } from './characters/index.js';
 import { START_Z, laneX, laneRow, jumpHeightAt, dodgeOffsetAt } from './layout.js';
+import { moverHit, moverNear } from './moving-obstacles.js';
 import { state, participants, addHistory } from '../core/store.js';
 import { raceSeconds, TRACKS, MIN_PLAYERS } from '../core/config.js';
 import { shuffle } from '../core/random.js';
@@ -294,14 +295,35 @@ function positionRunners() {
     const x = lane + dodgeOffsetAt(track.obstacles, lane, z);   // 높은 장애물은 옆으로 비켜 감
     placeRunner(r, x, z, Math.sin(t * 15 + i) * 0.05 * (1 - r.progress));
     if (r.progress >= 1) idleRunner(r); // 결승 후에는 멈춰 서기
-    else animateRunner(r, z, jumpHeightAt(track.obstacles, x, z), stepScale);
+    else animateRunner(r, z, Math.max(jumpHeightAt(track.obstacles, x, z), moverJump(r, x, z)), stepScale);
   });
+}
+
+/**
+ * 굴러오는 돌·도는 막대가 곧 닿을 것 같으면 알아서 점프 (연출용, 순위와 무관).
+ * 조금 앞(0.6칸)까지 넉넉하게 살펴서 미리 뛰어오르고, 지나가면 천천히 내려옴.
+ */
+function moverJump(r, x, z) {
+  let target = 0;
+  for (const o of track.moving || []) {
+    const m = o.o;
+    if (!moverNear(m, z)) continue;
+    if (moverHit(m, x, z - 0.6, 0, clock, track.centerX, 0.7) || moverHit(m, x, z, 0, clock, track.centerX, 0.4)) {
+      target = Math.max(target, m.clearHeight + 0.25);
+    }
+  }
+  const prev = r.moverJump || 0;
+  r.moverJump = target > prev ? prev + (target - prev) * 0.45 : prev * 0.88; // 빨리 뛰고 천천히 내려옴
+  return r.moverJump;
 }
 
 /** rawDt: 지난 프레임부터 흐른 실제 시간(초) */
 export function updateRace(rawDt) {
   clock += Math.min(rawDt, 0.07);
-  if (track) animateObstacles(track.animated, clock);
+  if (track) {
+    animateObstacles(track.animated, clock);
+    for (const m of track.moving || []) m.update(clock); // 굴러가는 돌·도는 막대
+  }
 
   if (race.phase === 'countdown') {
     const before = Math.ceil(race.countdown);
@@ -375,6 +397,8 @@ export function focusRunner() {
 }
 
 export const currentTrack = () => track;
+/** 장애물 움직임에 쓰는 시계(초) — 굴러가는 돌·도는 막대 위치 계산용 */
+export const raceClock = () => clock;
 
 /** 이름표 크기를 카메라와의 거리에 맞춤: 가까운 샷에서 화면을 가리지 않게 */
 export function updateLabels(camera) {

@@ -1,6 +1,15 @@
 // 모든 트랙에 공통인 경기장 뼈대: 땅, 도로, 레인, 난간, 출발 아치, 결승선. (장애물은 obstacles.js)
 import { THREE, add, box, bakeInto } from '../parts.js';
 import { buildObstacle, STRAIGHT_OBSTACLES } from './obstacles.js';
+import { buildMover, moverPosts } from '../moving-obstacles.js';
+
+// 굴러가는 돌·회전 막대 (줄 사이 빈 곳에)
+const STRAIGHT_MOVERS = [
+  { kind: 'boulder', x: 0, z: -8, r: 0.85, amp: 8.6, speed: 1.1, phase: 0, clearHeight: 1.9 },
+  { kind: 'spinner', x: 0, z: -34, len: 4.6, speed: 1.3, phase: 0, clearHeight: 1.2, barY: 0.75 },
+  { kind: 'boulder', x: 0, z: -60, r: 0.85, amp: 8.6, speed: 1.4, phase: 2, clearHeight: 1.9 },
+  { kind: 'spinner', x: 0, z: -87, len: 4.6, speed: -1.6, phase: 1, clearHeight: 1.2, barY: 0.75 },
+];
 
 const COURSE = { roadWidth: 22, laneCount: 8, finishZ: -100 };
 
@@ -48,10 +57,15 @@ export function buildStraightTrack(theme) {
 
   // 움직이는 장애물 (줄마다 색을 번갈아)
   const animated = STRAIGHT_OBSTACLES.map((o) => buildObstacle(group, o, o.row % 2 ? colors.accent : colors.rail));
+  const moving = STRAIGHT_MOVERS.map((o) => {
+    const m = buildMover(o, () => 0, colors.accent);
+    group.add(m.group);
+    return { o, update: m.update };
+  });
 
   return {
-    group, animated,
-    obstacles: STRAIGHT_OBSTACLES,
+    group, animated, moving,
+    obstacles: [...STRAIGHT_OBSTACLES, ...moverPosts(STRAIGHT_MOVERS)],
     sky: colors.sky,
     fog: { color: colors.sky, near: 125, far: 285 },
     finishZ: COURSE.finishZ,
