@@ -3,7 +3,7 @@
 export const STORAGE_KEY = 'classroom-race-v1';
 export const BACKUP_FORMAT = 'classroom-race-v1';
 
-export const MAX_STUDENTS = 40;
+export const MAX_STUDENTS = 60;
 export const MIN_PLAYERS = 2;
 export const MAX_HISTORY = 100;
 export const MAX_NAME_LENGTH = 30;
